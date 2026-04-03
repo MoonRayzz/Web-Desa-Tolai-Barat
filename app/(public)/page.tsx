@@ -1,12 +1,10 @@
-// File: desa-tolai-barat\app\(public)\page.tsx
-
 import type { Metadata } from "next";
 import HeroSection    from "@/components/home/HeroSection";
 import StatsSection   from "@/components/home/StatsSection";
+import AgendaSection  from "@/components/home/AgendaSection";
+import WisataSection  from "@/components/home/WisataSection";
 import BeritaSection  from "@/components/home/BeritaSection";
 import LayananSection from "@/components/home/LayananSection";
-// Import seksi baru
-import WisataSection  from "@/components/home/WisataSection";
 import MapSection     from "@/components/home/MapSection";
 
 export const metadata: Metadata = {
@@ -16,15 +14,18 @@ export const metadata: Metadata = {
     "wisata Pantai Arjuna, dan layanan warga.",
 };
 
+export const revalidate = 60;
+
 export default function HomePage() {
   return (
     <>
       <HeroSection />
       <StatsSection />
-      <WisataSection /> {/* Ditambahkan di sini */}
+      <AgendaSection />
+      <WisataSection />
       <BeritaSection />
       <LayananSection />
-      <MapSection />    {/* Ditambahkan di sini sebagai penutup sebelum footer */}
+      <MapSection />
     </>
   );
 }

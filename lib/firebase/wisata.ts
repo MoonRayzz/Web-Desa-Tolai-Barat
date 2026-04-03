@@ -10,7 +10,16 @@ const COL = "wisata";
 export async function getAllWisata(): Promise<Wisata[]> {
   try {
     const snap = await getDocs(query(collection(db, COL), orderBy("createdAt", "desc")));
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Wisata));
+    return snap.docs.map((d) => {
+      const data = d.data();
+      return {
+        id: d.id,
+        ...data,
+        // Perbaikan: Konversi Firebase Timestamp ke String ISO agar diterima oleh Client Component
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : (data.createdAt || null),
+        updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate().toISOString() : (data.updatedAt || null),
+      } as Wisata;
+    });
   } catch {
     return [];
   }
@@ -21,7 +30,7 @@ export async function getWisataFeatured(): Promise<Wisata[]> {
   return all.filter((w) => w.featured);
 }
 
-export async function createWisata(data: Omit<Wisata, "id">): Promise<string> {
+export async function createWisata(data: Omit<Wisata, "id" | "createdAt" | "updatedAt">): Promise<string> {
   const ref = await addDoc(collection(db, COL), {
     ...data,
     createdAt: serverTimestamp(),

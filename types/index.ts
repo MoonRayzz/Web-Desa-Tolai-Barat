@@ -24,6 +24,8 @@ export interface Wisata {
   image:       string;
   kategori:    WisataKategori;
   featured:    boolean;
+  createdAt?:  string | null;
+  updatedAt?:  string | null;
 }
 
 export type UmkmKategori =
@@ -37,6 +39,9 @@ export interface Umkm {
   image:       string;
   kategori:    UmkmKategori;
   whatsapp:    string | null;
+  // Perbaikan: Tambahkan field waktu di sini
+  createdAt?:  string | null;
+  updatedAt?:  string | null;
 }
 
 export interface PerangkatDesa {
@@ -52,4 +57,34 @@ export interface StatDesa {
   value: string;
   unit:  string;
   icon:  string;
+}
+
+// ─── Pengumuman & Agenda ─────────────────────────────────────────────────────
+export type PengumumanPriority = "normal" | "penting" | "darurat";
+export type PengumumanType     = "pengumuman" | "agenda";
+
+export interface Pengumuman {
+  id:        string;
+  title:     string;
+  content:   string;
+  type:      PengumumanType;
+  priority:  PengumumanPriority;
+  startDate: string;        // "YYYY-MM-DD"
+  endDate:   string | null; // null = tidak kadaluarsa
+  aktif:     boolean;
+  createdAt: string;
+}
+
+// ─── Layanan Desa ─────────────────────────────────────────────────────────────
+export type LayananTema = "ocean" | "gold" | "forest";
+
+export interface LayananDesa {
+  id:     string;
+  icon:   string;
+  judul:  string;
+  syarat: string[];
+  waktu:  string;
+  tema:   LayananTema;
+  aktif:  boolean;
+  urutan: number;
 }

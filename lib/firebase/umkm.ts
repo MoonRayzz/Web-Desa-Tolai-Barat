@@ -10,13 +10,22 @@ const COL = "umkm";
 export async function getAllUmkm(): Promise<Umkm[]> {
   try {
     const snap = await getDocs(query(collection(db, COL), orderBy("createdAt", "desc")));
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Umkm));
+    return snap.docs.map((d) => {
+      const data = d.data();
+      return {
+        id: d.id,
+        ...data,
+        // Perbaikan: Konversi Firebase Timestamp ke String ISO
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : (data.createdAt || null),
+        updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate().toISOString() : (data.updatedAt || null),
+      } as Umkm;
+    });
   } catch {
     return [];
   }
 }
 
-export async function createUmkm(data: Omit<Umkm, "id">): Promise<string> {
+export async function createUmkm(data: Omit<Umkm, "id" | "createdAt" | "updatedAt">): Promise<string> {
   const ref = await addDoc(collection(db, COL), {
     ...data,
     createdAt: serverTimestamp(),
