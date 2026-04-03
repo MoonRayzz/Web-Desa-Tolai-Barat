@@ -25,6 +25,10 @@ export interface DesaSettings {
   facebook:       string;
   instagram:      string;
   youtube:        string;
+  // Lokasi
+  koordinatLat:   string;
+  koordinatLng:   string;
+  googleMapsUrl:  string;
 }
 
 export const SETTINGS_DEFAULT: DesaSettings = {
@@ -35,9 +39,14 @@ export const SETTINGS_DEFAULT: DesaSettings = {
   rtRw:           "12 / 4",
   kodePos:        "94473",
   sejarah:
-    "Desa Tolai Barat merupakan bagian dari wilayah yang berkembang seiring program transmigrasi di Kabupaten Parigi Moutong sejak era 1967–1968. Seiring berjalannya waktu, komunitas yang awalnya merupakan kawasan transmigrasi berkembang menjadi desa yang mandiri dengan identitas budaya yang kuat.",
+    "Desa Tolai Barat merupakan bagian dari wilayah yang berkembang seiring " +
+    "program transmigrasi di Kabupaten Parigi Moutong sejak era 1967–1968. " +
+    "Seiring berjalannya waktu, komunitas yang awalnya merupakan kawasan " +
+    "transmigrasi berkembang menjadi desa yang mandiri dengan identitas budaya " +
+    "yang kuat — perpaduan antara kearifan lokal Sulawesi dengan budaya para transmigran.",
   visi:
-    "Terwujudnya Desa Tolai Barat yang Maju, Mandiri, Sejahtera, dan Berdaya Saing Berbasis Potensi Lokal.",
+    "Terwujudnya Desa Tolai Barat yang Maju, Mandiri, Sejahtera, dan " +
+    "Berdaya Saing Berbasis Potensi Lokal.",
   misi: [
     "Meningkatkan kualitas pelayanan publik yang transparan dan akuntabel",
     "Mengembangkan potensi wisata bahari dan agrowisata secara berkelanjutan",
@@ -53,6 +62,10 @@ export const SETTINGS_DEFAULT: DesaSettings = {
   facebook:   "",
   instagram:  "",
   youtube:    "",
+  koordinatLat:  "-0.988611",
+  koordinatLng:  "120.330833",
+  googleMapsUrl:
+    "https://maps.google.com/?q=Tolai+Barat,+Torue,+Parigi+Moutong",
 };
 
 const REF = () => doc(db, "settings", "desa");
@@ -68,5 +81,9 @@ export async function getDesaSettings(): Promise<DesaSettings> {
 }
 
 export async function saveDesaSettings(data: DesaSettings): Promise<void> {
-  await setDoc(REF(), { ...data, updatedAt: serverTimestamp() }, { merge: true });
+  await setDoc(
+    REF(),
+    { ...data, updatedAt: serverTimestamp() },
+    { merge: true }
+  );
 }

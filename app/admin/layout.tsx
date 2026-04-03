@@ -6,13 +6,14 @@ import { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 
 const NAV = [
-  { href: "/admin/dashboard", icon: "▦",  label: "Dashboard"  },
-  { href: "/admin/settings",  icon: "⚙",  label: "Pengaturan Desa" },
-  { href: "/admin/berita",    icon: "📰", label: "Berita"     },
-  { href: "/admin/wisata",    icon: "🏖", label: "Wisata"     },
-  { href: "/admin/umkm",      icon: "🏪", label: "UMKM"       },
-  { href: "/admin/galeri",    icon: "🖼", label: "Galeri"     },
-  { href: "/admin/perangkat", icon: "👥", label: "Perangkat"  },
+  { href: "/admin/dashboard",  icon: "▦",  label: "Dashboard"       },
+  { href: "/admin/analytics",  icon: "📊", label: "Pengunjung"      }, // ← tambah ini
+  { href: "/admin/settings",   icon: "⚙",  label: "Pengaturan Desa" },
+  { href: "/admin/berita",     icon: "📰", label: "Berita"          },
+  { href: "/admin/wisata",     icon: "🏖", label: "Wisata"          },
+  { href: "/admin/umkm",       icon: "🏪", label: "UMKM"            },
+  { href: "/admin/galeri",     icon: "🖼", label: "Galeri"          },
+  { href: "/admin/perangkat",  icon: "👥", label: "Perangkat"       },
 ];
 
 function AdminShell({ children }: { children: React.ReactNode }) {

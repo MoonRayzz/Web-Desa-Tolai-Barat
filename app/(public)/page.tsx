@@ -1,8 +1,13 @@
+// File: desa-tolai-barat\app\(public)\page.tsx
+
 import type { Metadata } from "next";
 import HeroSection    from "@/components/home/HeroSection";
 import StatsSection   from "@/components/home/StatsSection";
 import BeritaSection  from "@/components/home/BeritaSection";
 import LayananSection from "@/components/home/LayananSection";
+// Import seksi baru
+import WisataSection  from "@/components/home/WisataSection";
+import MapSection     from "@/components/home/MapSection";
 
 export const metadata: Metadata = {
   title: "Beranda",
@@ -16,8 +21,10 @@ export default function HomePage() {
     <>
       <HeroSection />
       <StatsSection />
+      <WisataSection /> {/* Ditambahkan di sini */}
       <BeritaSection />
       <LayananSection />
+      <MapSection />    {/* Ditambahkan di sini sebagai penutup sebelum footer */}
     </>
   );
 }

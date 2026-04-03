@@ -1,18 +1,44 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
-import { STAT_DESA } from "@/data/mock";
+import { useEffect, useRef, useState } from "react";
+// Import fungsi ambil pengaturan dari Firebase
+import { getDesaSettings } from "@/lib/firebase/settings";
+
+// Nilai cadangan saat data sedang di-load dari database
+const STAT_FALLBACK = [
+  { label: "Jumlah Penduduk", value: "...", unit: "jiwa",  icon: "👥" },
+  { label: "Kepala Keluarga", value: "...", unit: "KK",    icon: "🏠" },
+  { label: "Luas Wilayah",    value: "...", unit: "Ha",    icon: "🗺️" },
+  { label: "Jumlah Dusun",    value: "...", unit: "dusun", icon: "🌿" },
+  { label: "RT / RW",         value: "...", unit: "",      icon: "📍" },
+  { label: "Kode Pos",        value: "...", unit: "",      icon: "📮" },
+];
 
 export default function HeroSection() {
   const ref = useRef<HTMLDivElement>(null);
+  const [stats, setStats] = useState(STAT_FALLBACK);
 
   useEffect(() => {
+    // 1. Jalankan animasi fade in
     const el = ref.current;
-    if (!el) return;
-    requestAnimationFrame(() => {
-      el.style.opacity   = "1";
-      el.style.transform = "translateY(0)";
+    if (el) {
+      requestAnimationFrame(() => {
+        el.style.opacity   = "1";
+        el.style.transform = "translateY(0)";
+      });
+    }
+
+    // 2. Ambil data statistik dari Firebase secara asinkron
+    getDesaSettings().then((s) => {
+      setStats([
+        { label: "Jumlah Penduduk", value: s.jumlahPenduduk, unit: "jiwa",  icon: "👥" },
+        { label: "Kepala Keluarga", value: s.jumlahKK,       unit: "KK",    icon: "🏠" },
+        { label: "Luas Wilayah",    value: s.luasWilayah,    unit: "Ha",    icon: "🗺️" },
+        { label: "Jumlah Dusun",    value: s.jumlahDusun,    unit: "dusun", icon: "🌿" },
+        { label: "RT / RW",         value: s.rtRw,           unit: "",      icon: "📍" },
+        { label: "Kode Pos",        value: s.kodePos,        unit: "",      icon: "📮" },
+      ]);
     });
   }, []);
 
@@ -125,7 +151,8 @@ export default function HeroSection() {
             gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
             gap: "12px",
           }}>
-            {STAT_DESA.map((s, i) => (
+            {/* Loop menggunakan variabel "stats" yang berisi data dari database */}
+            {stats.map((s, i) => (
               <div key={s.label} style={{
                 background: "rgb(255 255 255 / 0.08)",
                 border: "1px solid rgb(255 255 255 / 0.12)",
