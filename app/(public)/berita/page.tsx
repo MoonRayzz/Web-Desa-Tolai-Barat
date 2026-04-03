@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getBeritaPublished } from "@/lib/firebase/berita";
 import { BERITA_MOCK } from "@/data/mock";
 import { formatTanggal } from "@/lib/utils";
+import type { Berita } from "@/types";
 
 export const metadata: Metadata = {
   title: "Berita & Informasi",
   description: "Berita dan informasi terkini dari Desa Tolai Barat.",
 };
+
+export const revalidate = 60;
 
 const WARNA: Record<string, { bg: string; text: string }> = {
   pengumuman:  { bg: "#E0F4F7", text: "#0B5E6B" },
@@ -15,7 +19,11 @@ const WARNA: Record<string, { bg: string; text: string }> = {
   pembangunan: { bg: "#F3EEFF", text: "#5B21B6" },
 };
 
-export default function BeritaPage() {
+export default async function BeritaPage() {
+  // Coba ambil dari Firestore, fallback ke mock kalau kosong/error
+  let beritaList: Berita[] = await getBeritaPublished(20);
+  if (beritaList.length === 0) beritaList = BERITA_MOCK;
+
   return (
     <>
       <div className="page-hero">
@@ -28,7 +36,7 @@ export default function BeritaPage() {
             Berita & Informasi
           </h1>
           <p style={{ color: "var(--color-ocean-300)", fontSize: "1rem" }}>
-            Kabar terbaru dari Desa Tolai Barat
+            {beritaList.length} artikel tersedia
           </p>
         </div>
       </div>
@@ -40,15 +48,12 @@ export default function BeritaPage() {
             gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
             gap: "24px",
           }}>
-            {BERITA_MOCK.map((b) => {
+            {beritaList.map((b) => {
               const w = WARNA[b.kategori] ?? WARNA.berita;
               return (
-                <Link
-                  key={b.id}
-                  href={`/berita/${b.slug}`}
+                <Link key={b.id} href={`/berita/${b.slug}`}
                   className="card-base card-hover"
-                  style={{ textDecoration: "none", display: "block" }}
-                >
+                  style={{ textDecoration: "none", display: "block" }}>
                   <div style={{
                     height: "200px",
                     background: "linear-gradient(135deg, var(--color-ocean-800), var(--color-ocean-600))",

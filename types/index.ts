@@ -1,5 +1,3 @@
-// Tipe data utama — dipakai di seluruh project
-
 export type BeritaKategori =
   | "pengumuman" | "berita" | "kegiatan" | "pembangunan";
 
@@ -8,12 +6,13 @@ export interface Berita {
   title:       string;
   slug:        string;
   excerpt:     string;
+  content:     string;
   coverImage:  string;
   kategori:    BeritaKategori;
   author:      string;
-  publishedAt: string;   // ISO date string
+  published:   boolean;
+  publishedAt: string;
   views:       number;
-  content: string;
 }
 
 export type WisataKategori = "bahari" | "alam" | "budaya" | "religi";
@@ -41,11 +40,11 @@ export interface Umkm {
 }
 
 export interface PerangkatDesa {
-  id:           string;
-  name:         string;
-  jabatan:      string;
-  photo:        string | null;
-  urutan:       number;
+  id:       string;
+  name:     string;
+  jabatan:  string;
+  photo:    string | null;
+  urutan:   number;
 }
 
 export interface StatDesa {
