@@ -1,4 +1,4 @@
-import type { Berita, Wisata, Umkm, PerangkatDesa, StatDesa } from "@/types";
+import { Berita, Wisata, Umkm, PerangkatDesa, StatDesa } from "@/types";
 
 export const STAT_DESA: StatDesa[] = [
   { label: "Jumlah Penduduk", value: "2.412",  unit: "jiwa",  icon: "👥" },
@@ -19,6 +19,7 @@ export const BERITA_MOCK: Berita[] = [
     coverImage:  "/images/placeholder-pantai.jpg",
     kategori:    "kegiatan",
     author:      "Admin Desa",
+    published:   true,
     publishedAt: "2025-06-30T08:00:00Z",
     views:       142,
   },
@@ -31,6 +32,7 @@ export const BERITA_MOCK: Berita[] = [
     coverImage:  "/images/placeholder-kegiatan.jpg",
     kategori:    "pengumuman",
     author:      "Admin Desa",
+    published:   true,
     publishedAt: "2025-06-28T09:00:00Z",
     views:       98,
   },
@@ -43,6 +45,7 @@ export const BERITA_MOCK: Berita[] = [
     coverImage:  "/images/placeholder-pembangunan.jpg",
     kategori:    "pembangunan",
     author:      "Admin Desa",
+    published:   true,
     publishedAt: "2025-06-20T07:00:00Z",
     views:       67,
   },
@@ -55,6 +58,7 @@ export const BERITA_MOCK: Berita[] = [
     coverImage:  "/images/placeholder-kesehatan.jpg",
     kategori:    "berita",
     author:      "Admin Desa",
+    published:   true,
     publishedAt: "2025-06-15T10:00:00Z",
     views:       54,
   },
@@ -67,6 +71,7 @@ export const BERITA_MOCK: Berita[] = [
     coverImage:  "/images/placeholder-rapat.jpg",
     kategori:    "pengumuman",
     author:      "Admin Desa",
+    published:   true,
     publishedAt: "2025-06-01T08:00:00Z",
     views:       43,
   },
@@ -79,6 +84,7 @@ export const BERITA_MOCK: Berita[] = [
     coverImage:  "/images/placeholder-umkm.jpg",
     kategori:    "kegiatan",
     author:      "Admin Desa",
+    published:   true,
     publishedAt: "2025-05-25T09:00:00Z",
     views:       89,
   },
