@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -16,6 +17,15 @@ const dmSans = DM_Sans({
   display:  "swap",
 });
 
+// PWA: Viewport & Warna Tema
+export const viewport: Viewport = {
+  themeColor: "#0B5E6B",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
+// PWA: Tambahkan manifest dan konfigurasi Apple/iOS
 export const metadata: Metadata = {
   title: {
     default:  "Desa Tolai Barat — Kec. Torue, Parigi Moutong",
@@ -31,6 +41,15 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
   ),
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Tolai Barat",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export default function RootLayout({
@@ -45,6 +64,8 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
     >
       <body style={{ fontFamily: "var(--font-sans)", backgroundColor: "white" }}>
+        {/* Tombol Install PWA melayang */}
+        <PWAInstallPrompt />
         {children}
       </body>
     </html>
