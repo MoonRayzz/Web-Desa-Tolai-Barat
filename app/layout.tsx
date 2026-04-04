@@ -17,7 +17,6 @@ const dmSans = DM_Sans({
   display:  "swap",
 });
 
-// PWA: Viewport & Warna Tema
 export const viewport: Viewport = {
   themeColor: "#0B5E6B",
   width: "device-width",
@@ -25,10 +24,8 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-// Pastikan siteUrl menggunakan domain asli jika sudah ada, atau Vercel sebagai fallback
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://web-desa-tolai-barat.vercel.app/";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://desa-tolai-barat.vercel.app";
 
-// PWA & SEO: Tambahkan manifest, konfigurasi Apple/iOS, dan OpenGraph
 export const metadata: Metadata = {
   title: {
     default:  "Desa Tolai Barat — Kec. Torue, Parigi Moutong",
@@ -44,7 +41,6 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   authors: [{ name: "Pemerintah Desa Tolai Barat" }],
   
-  // OpenGraph: Untuk preview bagus saat link disebar di Sosmed/WA
   openGraph: {
     type: "website",
     locale: "id_ID",
@@ -54,7 +50,7 @@ export const metadata: Metadata = {
     url: siteUrl,
     images: [
       {
-        url: "/og-image.jpg", // Buat gambar banner (1200x630px) simpan di folder public/ dengan nama og-image.jpg
+        url: "/og-image.jpg", 
         width: 1200,
         height: 630,
         alt: "Desa Tolai Barat",
@@ -62,9 +58,9 @@ export const metadata: Metadata = {
     ],
   },
 
-  // Verifikasi Google Search Console (Kosongkan dulu string-nya, nanti diisi di Langkah 4)
+  // Tempel kode verifikasi di sini
   verification: {
-    google: "ISI_KODE_VERIFIKASI_DARI_GOOGLE_DISINI", 
+    google: "tGznE5rNerGCz4Ga_DVEk8bRQkBwY6QuR0v1A9XzaqM", 
   },
 
   manifest: "/manifest.json",
@@ -90,7 +86,6 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
     >
       <body style={{ fontFamily: "var(--font-sans)", backgroundColor: "white" }}>
-        {/* Tombol Install PWA melayang */}
         <PWAInstallPrompt />
         {children}
       </body>
