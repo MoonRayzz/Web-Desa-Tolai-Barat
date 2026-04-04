@@ -25,7 +25,10 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-// PWA: Tambahkan manifest dan konfigurasi Apple/iOS
+// Pastikan siteUrl menggunakan domain asli jika sudah ada, atau Vercel sebagai fallback
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://web-desa-tolai-barat.vercel.app/";
+
+// PWA & SEO: Tambahkan manifest, konfigurasi Apple/iOS, dan OpenGraph
 export const metadata: Metadata = {
   title: {
     default:  "Desa Tolai Barat — Kec. Torue, Parigi Moutong",
@@ -36,11 +39,34 @@ export const metadata: Metadata = {
     "Sulawesi Tengah. Informasi desa, wisata Pantai Arjuna, UMKM, dan layanan warga.",
   keywords: [
     "Desa Tolai Barat", "Torue", "Parigi Moutong",
-    "Sulawesi Tengah", "Pantai Arjuna",
+    "Sulawesi Tengah", "Pantai Arjuna", "Desa Digital"
   ],
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://web-desa-tolai-barat.vercel.app/"
-  ),
+  metadataBase: new URL(siteUrl),
+  authors: [{ name: "Pemerintah Desa Tolai Barat" }],
+  
+  // OpenGraph: Untuk preview bagus saat link disebar di Sosmed/WA
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    siteName: "Desa Tolai Barat",
+    title: "Website Resmi Desa Tolai Barat",
+    description: "Portal informasi resmi Desa Tolai Barat, pesisir Teluk Tomini, Kecamatan Torue.",
+    url: siteUrl,
+    images: [
+      {
+        url: "/og-image.jpg", // Buat gambar banner (1200x630px) simpan di folder public/ dengan nama og-image.jpg
+        width: 1200,
+        height: 630,
+        alt: "Desa Tolai Barat",
+      },
+    ],
+  },
+
+  // Verifikasi Google Search Console (Kosongkan dulu string-nya, nanti diisi di Langkah 4)
+  verification: {
+    google: "ISI_KODE_VERIFIKASI_DARI_GOOGLE_DISINI", 
+  },
+
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
