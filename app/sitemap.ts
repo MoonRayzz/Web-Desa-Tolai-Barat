@@ -2,7 +2,11 @@ import type { MetadataRoute } from "next";
 import { getBeritaPublished } from "@/lib/firebase/berita";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://web-desa-tolai-barat.vercel.app";
+  // Mengambil URL dari env atau menggunakan domain yang terdaftar di Google Search Console
+  const rawBaseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://desa-tolai-barat.vercel.app";
+  
+  // Membuang garis miring (/) di akhir URL jika ada, untuk mencegah double slash (//)
+  const baseUrl = rawBaseUrl.replace(/\/$/, "");
 
   // Daftar halaman statis utama
   const staticPages: MetadataRoute.Sitemap = [
