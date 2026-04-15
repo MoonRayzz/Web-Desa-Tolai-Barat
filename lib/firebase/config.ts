@@ -1,7 +1,7 @@
 // File: lib/firebase/config.ts
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth, browserSessionPersistence, setPersistence } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey:            process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -18,5 +18,9 @@ const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 // Inisialisasi layanan
 export const db   = getFirestore(app);
 export const auth = getAuth(app);
+
+// Sesi login hanya berlaku selama tab/browser terbuka.
+// Setelah tab ditutup, user harus login ulang.
+setPersistence(auth, browserSessionPersistence).catch(console.error);
 
 export default app;

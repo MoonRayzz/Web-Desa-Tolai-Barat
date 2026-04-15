@@ -49,7 +49,12 @@
       </div>
     );
 
-    if (!user || pathname === "/admin/login") {
+    // User belum login & bukan halaman login → jangan render apapun,
+    // biarkan useEffect di atas yang mengarahkan ke /admin/login
+    if (!user && pathname !== "/admin/login") return null;
+
+    // Khusus halaman login: render tanpa shell sidebar
+    if (pathname === "/admin/login") {
       return <>{children}</>;
     }
 
@@ -182,7 +187,7 @@
                 marginBottom: "12px", overflow: "hidden",
                 textOverflow: "ellipsis", whiteSpace: "nowrap",
               }}>
-                {user.email}
+                {user?.email}
               </div>
             )}
             
