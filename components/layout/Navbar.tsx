@@ -4,24 +4,26 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
+import { getDesaSettings } from "@/lib/firebase/settings"; // <-- IMPORT SETTINGS
 
 const NAV_LINKS = [
-  { label: "Beranda",  href: "/"         },
-  { label: "Profil",   href: "/profil"   },
-  { label: "Berita",   href: "/berita"   },
-  { label: "Wisata",   href: "/wisata"   },
-  { label: "BUMDes",   href: "/bumdes"   }, // -> INI MENU BARUNYA
-  { label: "UMKM",     href: "/umkm"     },
-  { label: "Galeri",   href: "/galeri"   },
-  { label: "Survei",   href: "/survei"   },
-  { label: "Aspirasi", href: "/aspirasi" },
-  { label: "Layanan",  href: "/layanan"  },
+  { label: "Beranda",      href: "/"         },
+  { label: "Profil",       href: "/profil"   },
+  { label: "Berita",       href: "/berita"   },
+  { label: "Wisata",       href: "/wisata"   },
+  { label: "Potensi Desa", href: "/potensi"  }, // Menyesuaikan menu baru
+  { label: "Galeri",       href: "/galeri"   },
+  { label: "Survei",       href: "/survei"   },
+  { label: "Layanan",      href: "/layanan"  },
 ];
 
 export default function Navbar() {
   const pathname                = usePathname();
   const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  
+  // STATE UNTUK LOGO DINAMIS
+  const [logoUrl, setLogoUrl]   = useState("");
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 20);
@@ -35,6 +37,11 @@ export default function Navbar() {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
+
+  // AMBIL LOGO SAAT NAVBAR DIMUAT
+  useEffect(() => {
+    getDesaSettings().then(s => setLogoUrl(s.logoDesa || ""));
+  }, []);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -65,23 +72,25 @@ export default function Navbar() {
               display: "flex", alignItems: "center",
               gap: "12px", textDecoration: "none",
             }}>
+              
+              {/* --- AREA LOGO DINAMIS --- */}
               <div style={{
                 width: 38, height: 38, borderRadius: "10px",
-                background: "var(--color-ocean-700)",
+                background: logoUrl ? "white" : "var(--color-ocean-700)",
                 display: "flex", alignItems: "center",
                 justifyContent: "center", flexShrink: 0,
+                overflow: "hidden", padding: logoUrl ? "2px" : "0"
               }}>
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                  <path
-                    d="M10 3C10 3 5 7 5 11.5C5 14.3 7.2 16.5 10 16.5C12.8 16.5 15 14.3 15 11.5C15 7 10 3 10 3Z"
-                    fill="white" opacity="0.9"
-                  />
-                  <path
-                    d="M10 8C10 8 7.5 10 7.5 11.5C7.5 12.9 8.6 14 10 14C11.4 14 12.5 12.9 12.5 11.5C12.5 10 10 8 10 8Z"
-                    fill="#F5C842"
-                  />
-                </svg>
+                {logoUrl ? (
+                  <img src={logoUrl} alt="Logo Desa" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 3C10 3 5 7 5 11.5C5 14.3 7.2 16.5 10 16.5C12.8 16.5 15 14.3 15 11.5C15 7 10 3 10 3Z" fill="white" opacity="0.9" />
+                    <path d="M10 8C10 8 7.5 10 7.5 11.5C7.5 12.9 8.6 14 10 14C11.4 14 12.5 12.9 12.5 11.5C12.5 10 10 8 10 8Z" fill="#F5C842" />
+                  </svg>
+                )}
               </div>
+
               <div style={{ lineHeight: 1.2 }}>
                 <div style={{
                   fontFamily: "var(--font-display)", fontWeight: 600,
@@ -99,10 +108,7 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Nav */}
-            <nav
-              style={{ display: "none", alignItems: "center", gap: "2px" }}
-              className="lg-flex"
-            >
+            <nav style={{ display: "none", alignItems: "center", gap: "2px" }} className="lg-flex">
               {NAV_LINKS.map((l) => (
                 <Link
                   key={l.href}
@@ -114,14 +120,8 @@ export default function Navbar() {
                     background: isActive(l.href) ? clrActiveBg : "transparent",
                     transition: "all 0.2s", textDecoration: "none",
                   }}
-                  onMouseEnter={(e) => {
-                    if (!isActive(l.href))
-                      (e.currentTarget as HTMLElement).style.background = clrHoverBg;
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive(l.href))
-                      (e.currentTarget as HTMLElement).style.background = "transparent";
-                  }}
+                  onMouseEnter={(e) => { if (!isActive(l.href)) (e.currentTarget as HTMLElement).style.background = clrHoverBg; }}
+                  onMouseLeave={(e) => { if (!isActive(l.href)) (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                 >
                   {l.label}
                 </Link>
@@ -130,11 +130,7 @@ export default function Navbar() {
 
             {/* Desktop CTA */}
             <div style={{ display: "none" }} className="lg-flex">
-              <Link
-                href="/layanan"
-                className="btn-primary"
-                style={{ padding: "9px 20px", fontSize: "0.875rem" }}
-              >
+              <Link href="/layanan" className="btn-primary" style={{ padding: "9px 20px", fontSize: "0.875rem" }}>
                 Portal Warga
               </Link>
             </div>
@@ -152,10 +148,7 @@ export default function Navbar() {
             >
               <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
                 {open ? (
-                  <path
-                    d="M5 5L17 17M17 5L5 17"
-                    stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                  />
+                  <path d="M5 5L17 17M17 5L5 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 ) : (
                   <>
                     <line x1="3" y1="7"  x2="19" y2="7"  stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
@@ -177,94 +170,42 @@ export default function Navbar() {
             onClick={() => setOpen(false)}
             style={{
               position: "fixed", inset: 0, zIndex: 40,
-              background: "rgba(13,31,45,0.5)",
-              backdropFilter: "blur(4px)",
+              background: "rgba(13,31,45,0.5)", backdropFilter: "blur(4px)",
             }}
           />
           <div style={{
             position: "fixed", top: 0, right: 0, bottom: 0, zIndex: 50,
-            width: "280px", background: "white",
-            boxShadow: "var(--shadow-card-lg)",
-            display: "flex", flexDirection: "column",
-            animation: "fadeIn 0.2s ease-out",
+            width: "280px", background: "white", boxShadow: "var(--shadow-card-lg)",
+            display: "flex", flexDirection: "column", animation: "fadeIn 0.2s ease-out",
           }}>
-            {/* Drawer header */}
-            <div style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "16px 20px",
-              borderBottom: "1px solid var(--color-ocean-100)",
-            }}>
-              <span style={{
-                fontFamily: "var(--font-display)", fontWeight: 600,
-                fontSize: "1rem", color: "var(--color-ocean-900)",
-              }}>
-                Menu
-              </span>
-              <button
-                onClick={() => setOpen(false)}
-                style={{
-                  border: "none", background: "none", cursor: "pointer",
-                  color: "var(--color-ocean-600)", padding: "4px",
-                }}
-              >
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                  <path
-                    d="M4 4L14 14M14 4L4 14"
-                    stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                  />
-                </svg>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid var(--color-ocean-100)" }}>
+              <span style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "1rem", color: "var(--color-ocean-900)" }}>Menu</span>
+              <button onClick={() => setOpen(false)} style={{ border: "none", background: "none", cursor: "pointer", color: "var(--color-ocean-600)", padding: "4px" }}>
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 4L14 14M14 4L4 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
               </button>
             </div>
 
-            {/* Links */}
             <nav style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
               {NAV_LINKS.map((l) => (
                 <Link
-                  key={l.href}
-                  href={l.href}
+                  key={l.href} href={l.href}
                   style={{
-                    display: "flex", alignItems: "center",
-                    justifyContent: "space-between",
-                    padding: "12px 16px", borderRadius: "12px",
-                    marginBottom: "4px", fontSize: "0.9rem", fontWeight: 500,
-                    color: isActive(l.href)
-                      ? "var(--color-ocean-700)"
-                      : "var(--color-ocean-800)",
-                    background: isActive(l.href)
-                      ? "var(--color-ocean-100)"
-                      : "transparent",
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "12px 16px", borderRadius: "12px", marginBottom: "4px", fontSize: "0.9rem", fontWeight: 500,
+                    color: isActive(l.href) ? "var(--color-ocean-700)" : "var(--color-ocean-800)",
+                    background: isActive(l.href) ? "var(--color-ocean-100)" : "transparent",
                     textDecoration: "none", transition: "background 0.15s",
                   }}
                 >
                   {l.label}
-                  {isActive(l.href) && (
-                    <span style={{
-                      width: 6, height: 6, borderRadius: "50%",
-                      background: "var(--color-ocean-700)", flexShrink: 0,
-                    }} />
-                  )}
+                  {isActive(l.href) && (<span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--color-ocean-700)", flexShrink: 0 }} />)}
                 </Link>
               ))}
             </nav>
 
-            {/* Footer drawer */}
-            <div style={{
-              padding: "16px 20px",
-              borderTop: "1px solid var(--color-ocean-100)",
-            }}>
-              <Link
-                href="/layanan"
-                className="btn-primary"
-                style={{ width: "100%", justifyContent: "center", padding: "12px" }}
-              >
-                Portal Warga
-              </Link>
-              <p style={{
-                textAlign: "center", fontSize: "0.7rem",
-                color: "var(--color-ocean-400)", marginTop: "10px",
-              }}>
-                Desa Tolai Barat · Kode Pos 94473
-              </p>
+            <div style={{ padding: "16px 20px", borderTop: "1px solid var(--color-ocean-100)" }}>
+              <Link href="/layanan" className="btn-primary" style={{ width: "100%", justifyContent: "center", padding: "12px" }}>Portal Warga</Link>
+              <p style={{ textAlign: "center", fontSize: "0.7rem", color: "var(--color-ocean-400)", marginTop: "10px" }}>Desa Tolai Barat · Kode Pos 94473</p>
             </div>
           </div>
         </>

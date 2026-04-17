@@ -60,6 +60,16 @@ export interface StatDesa {
   icon:  string;
 }
 
+// ─── Dusun & Demografi (BARU) ────────────────────────────────────────────────
+export interface DusunData {
+  id:        string;
+  nama:      string;
+  kk:        number;
+  lakiLaki:  number;
+  perempuan: number;
+  total:     number;
+}
+
 // ─── Pengumuman & Agenda ─────────────────────────────────────────────────────
 export type PengumumanPriority = "normal" | "penting" | "darurat";
 export type PengumumanType     = "pengumuman" | "agenda";
@@ -146,7 +156,6 @@ export interface Aspirasi {
 
 // ─── BUMDes (Badan Usaha Milik Desa) ──────────────────────────────────────────
 
-// 1. Profil Utama BUMDes (Data tunggal)
 export interface BumdesProfile {
   nama:      string;
   deskripsi: string;
@@ -156,7 +165,6 @@ export interface BumdesProfile {
   visi:      string;
 }
 
-// 2. Unit Usaha BUMDes (Koleksi/Daftar)
 export interface BumdesUnit {
   id:          string;
   namaUnit:    string;
@@ -167,4 +175,22 @@ export interface BumdesUnit {
   aktif:       boolean;
   createdAt?:  string | null;
   updatedAt?:  string | null;
+}
+
+// Tambahkan/Ubah di types/index.ts
+
+export type PotensiKategori = "makro" | "mikro";
+export type PotensiSektor = "pertanian" | "perikanan" | "perkebunan" | "perdagangan" | "jasa";
+
+export interface PotensiDesa {
+  id:           string;
+  nama:         string;
+  kategori:     PotensiKategori;
+  sektor:       PotensiSektor;
+  deskripsi:    string;
+  metrik?:      string; // Misal: "446 Hektar" atau "10 Ton/Panen"
+  image:        string;
+  kontakName?:  string;
+  whatsapp?:    string;
+  updatedAt?:   string;
 }

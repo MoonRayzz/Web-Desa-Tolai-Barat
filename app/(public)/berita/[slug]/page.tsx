@@ -1,3 +1,4 @@
+// File: app/(public)/berita/[slug]/page.tsx
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -11,11 +12,36 @@ import type { Berita } from "@/types";
 
 type Props = { params: Promise<{ slug: string }> };
 
+// FUNGSI SEO DINAMIS: Men-generate metadata unik untuk setiap halaman berita
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const berita   = await getBeritaBySlug(slug);
+  
   if (!berita) return { title: "Berita Tidak Ditemukan" };
-  return { title: berita.title, description: berita.excerpt };
+  
+  const title = berita.title;
+  // Jika excerpt kosong, ambil dari awal konten html lalu hapus tag HTML-nya
+  const description = berita.excerpt || berita.content.substring(0, 160).replace(/<[^>]+>/g, '') + "...";
+  const imageUrl = berita.coverImage || "/images/potensi-hero.jpg";
+
+  return { 
+    title: title, 
+    description: description,
+    openGraph: {
+      title: title,
+      description: description,
+      type: "article",
+      publishedTime: berita.publishedAt ? new Date(berita.publishedAt).toISOString() : undefined,
+      authors: [berita.author || "Admin Desa"],
+      images: [{ url: imageUrl }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: title,
+      description: description,
+      images: [imageUrl],
+    }
+  };
 }
 
 export default async function BeritaDetailPage({ params }: Props) {

@@ -1,3 +1,5 @@
+// File: lib/firebase/perangkat.ts
+
 import {
   collection, getDocs, addDoc, updateDoc, deleteDoc,
   doc, orderBy, query, serverTimestamp,
@@ -12,7 +14,21 @@ export async function getAllPerangkat(): Promise<PerangkatDesa[]> {
     const snap = await getDocs(
       query(collection(db, COL), orderBy("urutan", "asc"))
     );
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() } as PerangkatDesa));
+    
+    // PERBAIKAN: Mengonversi data dari Firebase agar "aman" dilempar ke Client Component
+    return snap.docs.map((d) => {
+      const data = d.data();
+      return {
+        id: d.id,
+        name: data.name || "",
+        jabatan: data.jabatan || "",
+        photo: data.photo || null,
+        urutan: data.urutan || 99,
+        // Ubah Timestamp Firebase menjadi String biasa (ISO)
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : null,
+        updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate().toISOString() : null,
+      } as PerangkatDesa & { createdAt?: string | null, updatedAt?: string | null };
+    });
   } catch {
     return [];
   }

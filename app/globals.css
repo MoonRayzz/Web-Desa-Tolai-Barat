@@ -361,3 +361,37 @@
   background: var(--color-ocean-900);
   padding: 100px 0 60px;
 }
+
+/* Tambahkan di bagian akhir file app/globals.css */
+
+/* ─── Utilitas 3D Flip Card ──────────────────────────────── */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* ─── Animasi Pertumbuhan Bar ────────────────────────────── */
+@keyframes growWidth {
+  from { width: 0; }
+  to { width: var(--target-width); }
+}
+
+.animate-grow {
+  animation: growWidth 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ─── Hover Effect Dinamis ────────────────────────────────── */
+.group:hover .group-hover-flip {
+  transform: rotateY(180deg);
+}

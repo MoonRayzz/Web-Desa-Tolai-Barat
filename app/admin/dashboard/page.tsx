@@ -1,39 +1,40 @@
+// File: app/admin/dashboard/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getAllBeritaAdmin } from "@/lib/firebase/berita";
 import { getAllWisata } from "@/lib/firebase/wisata";
-import { getAllUmkm } from "@/lib/firebase/umkm";
+import { getAllPotensi } from "@/lib/firebase/potensi"; // <-- PENGGANTI UMKM
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState({ berita: 0, wisata: 0, umkm: 0 });
+  const [stats, setStats] = useState({ berita: 0, wisata: 0, potensi: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const [b, w, u] = await Promise.all([
+      const [b, w, p] = await Promise.all([
         getAllBeritaAdmin(),
         getAllWisata(),
-        getAllUmkm(),
+        getAllPotensi(), // <-- Load Potensi
       ]);
-      setStats({ berita: b.length, wisata: w.length, umkm: u.length });
+      setStats({ berita: b.length, wisata: w.length, potensi: p.length });
       setLoading(false);
     }
     load();
   }, []);
 
   const CARDS = [
-    { label: "Total Berita",  value: stats.berita, href: "/admin/berita",    emoji: "📰", bg: "var(--color-ocean-100)",  color: "var(--color-ocean-700)"  },
-    { label: "Destinasi Wisata", value: stats.wisata, href: "/admin/wisata", emoji: "🏖️", bg: "var(--color-gold-100)",  color: "var(--color-gold-700)"   },
-    { label: "UMKM Terdaftar",value: stats.umkm,   href: "/admin/umkm",     emoji: "🏪", bg: "var(--color-forest-100)",color: "var(--color-forest-700)" },
+    { label: "Total Berita",     value: stats.berita,  href: "/admin/berita",  emoji: "📰", bg: "var(--color-ocean-100)",  color: "var(--color-ocean-700)"  },
+    { label: "Destinasi Wisata", value: stats.wisata,  href: "/admin/wisata",  emoji: "🏖️", bg: "var(--color-gold-100)",   color: "var(--color-gold-700)"   },
+    { label: "Potensi & UMKM",   value: stats.potensi, href: "/admin/potensi", emoji: "🌾", bg: "var(--color-forest-100)", color: "var(--color-forest-700)" },
   ];
 
   const SHORTCUTS = [
     { label: "Tambah Berita",    href: "/admin/berita/tambah",  emoji: "✏️"  },
     { label: "Edit Info Desa",   href: "/admin/settings",       emoji: "⚙️"  },
     { label: "Kelola Wisata",    href: "/admin/wisata",         emoji: "🏖️"  },
-    { label: "Kelola UMKM",      href: "/admin/umkm",           emoji: "🏪"  },
+    { label: "Kelola Potensi",   href: "/admin/potensi",        emoji: "🌾"  }, // <-- Shortcut baru
     { label: "Kelola Perangkat", href: "/admin/perangkat",      emoji: "👥"  },
     { label: "Lihat Website",    href: "/",                     emoji: "🌐"  },
   ];
