@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import { getDesaSettings } from "@/lib/firebase/settings"; // <-- IMPORT DATABASE SETTINGS
+import { getDesaSettings } from "@/lib/firebase/settings";
 
 const NAV = [
   { href: "/admin/dashboard",  icon: "▦",  label: "Dashboard"       },
@@ -29,14 +29,12 @@ function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   
-  // STATE UNTUK LOGO
   const [logoUrl, setLogoUrl] = useState("");
 
   useEffect(() => {
     if (!loading && !user && pathname !== "/admin/login") {
       router.replace("/admin/login");
     }
-    // FETCH LOGO SAAT LOAD
     getDesaSettings().then(s => setLogoUrl(s.logoDesa || ""));
   }, [user, loading, pathname, router]);
 
@@ -59,19 +57,18 @@ function AdminShell({ children }: { children: React.ReactNode }) {
         <div style={{ padding: isCollapsed ? "20px 0" : "20px 16px", borderBottom: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: isCollapsed ? "center" : "space-between", flexDirection: isCollapsed ? "column" : "row", gap: isCollapsed ? "16px" : "0" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             
-            {/* AREA LOGO ADMIN DINAMIS */}
-            <div style={{ 
-              width: 34, height: 34, borderRadius: "8px", 
-              background: logoUrl ? "white" : "var(--color-ocean-700)", 
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.1rem", flexShrink: 0,
-              overflow: "hidden", padding: logoUrl ? "2px" : "0"
-            }}>
-              {logoUrl ? (
-                <img src={logoUrl} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-              ) : (
-                "🌊"
-              )}
-            </div>
+            {/* --- LOGO DIPERBAIKI --- */}
+            {logoUrl ? (
+              <img src={logoUrl} alt="Logo" style={{ width: "36px", height: "36px", objectFit: "contain", flexShrink: 0 }} />
+            ) : (
+              <div style={{ 
+                width: 34, height: 34, borderRadius: "8px", 
+                background: "var(--color-ocean-700)", 
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.1rem", flexShrink: 0,
+              }}>
+                🌊
+              </div>
+            )}
             
             {!isCollapsed && (<div><div style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "0.85rem", color: "white" }}>Tolai Barat</div><div style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.4)" }}>Panel Admin</div></div>)}
           </div>

@@ -32,19 +32,18 @@ export default async function Footer() {
           <div style={{ gridColumn: "span 1" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "20px" }}>
               
-              {/* --- AREA LOGO DINAMIS --- */}
-              <div style={{
-                width: 46, height: 46, borderRadius: "10px",
-                background: s.logoDesa ? "white" : "var(--color-ocean-700)",
-                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                overflow: "hidden", padding: s.logoDesa ? "4px" : "0"
-              }}>
-                {s.logoDesa ? (
-                  <img src={s.logoDesa} alt="Logo Desa" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                ) : (
+              {/* --- LOGO DIPERBAIKI: Transparan dan lebih besar --- */}
+              {s.logoDesa ? (
+                <img src={s.logoDesa} alt="Logo Desa" style={{ width: "52px", height: "52px", objectFit: "contain", flexShrink: 0 }} />
+              ) : (
+                <div style={{
+                  width: 46, height: 46, borderRadius: "10px",
+                  background: "var(--color-ocean-700)",
+                  display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                }}>
                   <span style={{ fontSize: "1.3rem" }}>🌊</span>
-                )}
-              </div>
+                </div>
+              )}
               
               <div>
                 <div style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: "1rem", color: "white" }}>Desa Tolai Barat</div>

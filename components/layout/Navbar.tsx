@@ -4,14 +4,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { getDesaSettings } from "@/lib/firebase/settings"; // <-- IMPORT SETTINGS
+import { getDesaSettings } from "@/lib/firebase/settings";
 
 const NAV_LINKS = [
   { label: "Beranda",      href: "/"         },
   { label: "Profil",       href: "/profil"   },
   { label: "Berita",       href: "/berita"   },
   { label: "Wisata",       href: "/wisata"   },
-  { label: "Potensi Desa", href: "/potensi"  }, // Menyesuaikan menu baru
+  { label: "Potensi Desa", href: "/potensi"  },
   { label: "Galeri",       href: "/galeri"   },
   { label: "Survei",       href: "/survei"   },
   { label: "Layanan",      href: "/layanan"  },
@@ -22,7 +22,6 @@ export default function Navbar() {
   const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
   
-  // STATE UNTUK LOGO DINAMIS
   const [logoUrl, setLogoUrl]   = useState("");
 
   useEffect(() => {
@@ -38,7 +37,6 @@ export default function Navbar() {
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
-  // AMBIL LOGO SAAT NAVBAR DIMUAT
   useEffect(() => {
     getDesaSettings().then(s => setLogoUrl(s.logoDesa || ""));
   }, []);
@@ -67,29 +65,27 @@ export default function Navbar() {
             justifyContent: "space-between", height: "68px",
           }}>
 
-            {/* Logo */}
             <Link href="/" style={{
               display: "flex", alignItems: "center",
               gap: "12px", textDecoration: "none",
             }}>
               
-              {/* --- AREA LOGO DINAMIS --- */}
-              <div style={{
-                width: 38, height: 38, borderRadius: "10px",
-                background: logoUrl ? "white" : "var(--color-ocean-700)",
-                display: "flex", alignItems: "center",
-                justifyContent: "center", flexShrink: 0,
-                overflow: "hidden", padding: logoUrl ? "2px" : "0"
-              }}>
-                {logoUrl ? (
-                  <img src={logoUrl} alt="Logo Desa" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-                ) : (
+              {/* --- LOGO DIPERBAIKI: Tanpa background putih, ukuran diperbesar --- */}
+              {logoUrl ? (
+                <img src={logoUrl} alt="Logo Desa" style={{ width: "44px", height: "44px", objectFit: "contain", flexShrink: 0 }} />
+              ) : (
+                <div style={{
+                  width: 38, height: 38, borderRadius: "10px",
+                  background: "var(--color-ocean-700)",
+                  display: "flex", alignItems: "center",
+                  justifyContent: "center", flexShrink: 0,
+                }}>
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M10 3C10 3 5 7 5 11.5C5 14.3 7.2 16.5 10 16.5C12.8 16.5 15 14.3 15 11.5C15 7 10 3 10 3Z" fill="white" opacity="0.9" />
                     <path d="M10 8C10 8 7.5 10 7.5 11.5C7.5 12.9 8.6 14 10 14C11.4 14 12.5 12.9 12.5 11.5C12.5 10 10 8 10 8Z" fill="#F5C842" />
                   </svg>
-                )}
-              </div>
+                </div>
+              )}
 
               <div style={{ lineHeight: 1.2 }}>
                 <div style={{
@@ -107,7 +103,6 @@ export default function Navbar() {
               </div>
             </Link>
 
-            {/* Desktop Nav */}
             <nav style={{ display: "none", alignItems: "center", gap: "2px" }} className="lg-flex">
               {NAV_LINKS.map((l) => (
                 <Link
@@ -128,14 +123,12 @@ export default function Navbar() {
               ))}
             </nav>
 
-            {/* Desktop CTA */}
             <div style={{ display: "none" }} className="lg-flex">
               <Link href="/layanan" className="btn-primary" style={{ padding: "9px 20px", fontSize: "0.875rem" }}>
                 Portal Warga
               </Link>
             </div>
 
-            {/* Hamburger */}
             <button
               onClick={() => setOpen(!open)}
               aria-label="Menu"
@@ -163,7 +156,6 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* Mobile Menu */}
       {open && (
         <>
           <div
