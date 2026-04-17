@@ -1,118 +1,122 @@
+// File: app/admin/login/page.tsx
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase/config";
+import { getDesaSettings } from "@/lib/firebase/settings";
 
 export default function LoginPage() {
-  const { login } = useAuth();
-  const router    = useRouter();
-  const [email, setEmail]       = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError]       = useState("");
-  const [loading, setLoading]   = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+  // STATE UNTUK LOGO DESA
+  const [logoUrl, setLogoUrl] = useState("");
+  const router = useRouter();
 
-  async function handleSubmit(e: FormEvent) {
+  // AMBIL LOGO SAAT HALAMAN DIMUAT
+  useEffect(() => {
+    getDesaSettings().then((s) => setLogoUrl(s.logoDesa || ""));
+  }, []);
+
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    setError("");
     setLoading(true);
+    setError("");
     try {
-      await login(email, password);
-      router.replace("/admin/dashboard");
-    } catch {
-      setError("Email atau password salah. Silakan coba lagi.");
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push("/admin/dashboard");
+    } catch (err: any) {
+      setError("Email atau password salah.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "var(--color-ocean-900)",
-      display: "flex", alignItems: "center", justifyContent: "center",
-      padding: "20px",
-    }}>
-      <div style={{
-        background: "white", borderRadius: "24px",
-        padding: "40px", width: "100%", maxWidth: "400px",
-        boxShadow: "var(--shadow-card-lg)",
-      }}>
-        {/* Logo */}
-        <div style={{ textAlign: "center", marginBottom: "32px" }}>
-          <div style={{
-            width: 56, height: 56, borderRadius: "16px",
-            background: "var(--color-ocean-700)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "1.75rem", margin: "0 auto 14px",
-          }}>
-            🌊
+    <div className="min-h-screen flex items-center justify-center bg-ocean-900 px-4">
+      <div className="max-w-md w-full bg-white rounded-[2.5rem] p-10 shadow-2xl">
+        <div className="text-center mb-8">
+          
+          {/* AREA LOGO DINAMIS */}
+          <div className="flex justify-center mb-6">
+            <div style={{ 
+              width: 80, height: 80, 
+              background: logoUrl ? "transparent" : "var(--color-ocean-700)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              borderRadius: "20px", overflow: "hidden"
+            }}>
+              {logoUrl ? (
+                <img src={logoUrl} alt="Logo Desa" className="w-full h-full object-contain" />
+              ) : (
+                <span className="text-3xl">🌊</span>
+              )}
+            </div>
           </div>
-          <h1 style={{
-            fontFamily: "var(--font-display)", fontWeight: 700,
-            fontSize: "1.35rem", color: "var(--color-ocean-900)", marginBottom: "6px",
-          }}>
+
+          <h1 className="font-display font-bold text-2xl text-ocean-900 mb-2">
             Panel Admin
           </h1>
-          <p style={{ fontSize: "0.85rem", color: "var(--color-ocean-500)" }}>
-            Desa Tolai Barat
+          <p className="text-sm text-ocean-500">
+            Masuk untuk mengelola data Desa Tolai Barat
           </p>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: "16px" }}>
-            <label style={{
-              display: "block", fontSize: "0.82rem", fontWeight: 500,
-              color: "var(--color-ocean-700)", marginBottom: "6px",
-            }}>
-              Email Admin
+        {error && (
+          <div className="bg-red-50 text-red-600 text-sm p-4 rounded-xl mb-6 text-center font-medium border border-red-100">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div>
+            <label className="text-xs font-bold text-ocean-700 uppercase tracking-widest ml-1 mb-2 block">
+              Email Address
             </label>
             <input
               type="email"
+              required
+              className="input-base w-full bg-ocean-50 border-none focus:ring-2 focus:ring-ocean-500"
+              placeholder="admin@desa.id"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@email.com"
-              required
-              className="input-base"
             />
           </div>
-
-          <div style={{ marginBottom: "24px" }}>
-            <label style={{
-              display: "block", fontSize: "0.82rem", fontWeight: 500,
-              color: "var(--color-ocean-700)", marginBottom: "6px",
-            }}>
+          <div>
+            <label className="text-xs font-bold text-ocean-700 uppercase tracking-widest ml-1 mb-2 block">
               Password
             </label>
             <input
               type="password"
+              required
+              className="input-base w-full bg-ocean-50 border-none focus:ring-2 focus:ring-ocean-500"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              className="input-base"
             />
           </div>
-
-          {error && (
-            <div style={{
-              background: "#FEE2E2", color: "#991B1B",
-              padding: "10px 14px", borderRadius: "10px",
-              fontSize: "0.82rem", marginBottom: "16px",
-            }}>
-              {error}
-            </div>
-          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="btn-primary"
-            style={{ width: "100%", padding: "13px", fontSize: "0.95rem" }}
+            className="btn-primary w-full py-4 mt-4 text-base shadow-lg shadow-ocean-900/20"
           >
-            {loading ? "Memproses..." : "Masuk ke Panel Admin"}
+            {loading ? "Menghubungkan..." : "Masuk ke Dashboard"}
           </button>
         </form>
+
+        <div className="mt-8 text-center">
+          <button 
+            type="button"
+            onClick={() => router.push("/")}
+            className="text-sm text-ocean-400 hover:text-ocean-600 transition-colors"
+          >
+            ← Kembali ke Beranda
+          </button>
+        </div>
       </div>
     </div>
   );
