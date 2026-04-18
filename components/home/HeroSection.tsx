@@ -10,7 +10,7 @@ export default function HeroSection() {
     const elText = textRef.current;
     if (elText) {
       requestAnimationFrame(() => {
-        elText.style.opacity   = "1";
+        elText.style.opacity = "1";
         elText.style.transform = "translateY(0)";
       });
     }
@@ -31,7 +31,7 @@ export default function HeroSection() {
           width: "100%",
           height: "100%",
           objectFit: "cover", // Memaksa video menutupi layar (akan ter-crop otomatis)
-          objectPosition: "center", 
+          objectPosition: "center",
           opacity: 0.7, // Sedikit dinaikkan opacity videonya
           zIndex: 0,
         }}
@@ -40,18 +40,18 @@ export default function HeroSection() {
       </video>
 
       {/* VIGNETTE GRADIENT OVERLAY (Efek Sinematik Gelap di Pinggir) */}
-      <div 
+      <div
         style={{
           position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none",
           background: "radial-gradient(circle at center, transparent 20%, var(--color-ocean-900) 100%)",
           opacity: 0.8
-        }} 
+        }}
       />
-      <div 
+      <div
         style={{
           position: "absolute", inset: 0, zIndex: 1, pointerEvents: "none",
           background: "linear-gradient(to top, var(--color-ocean-900) 2%, transparent 40%)"
-        }} 
+        }}
       />
 
       {/* Wave (Bawah) */}
@@ -73,7 +73,7 @@ export default function HeroSection() {
             opacity: 0,
             transform: "translateY(28px)",
             transition: "opacity 1s ease-out, transform 1s ease-out",
-            
+
             // EFEK KACA (GLASSMORPHISM)
             background: "rgba(11, 94, 107, 0.25)", // Warna ocean yang transparan
             backdropFilter: "blur(0px)", // Efek blur
@@ -92,7 +92,7 @@ export default function HeroSection() {
             textTransform: "uppercase", letterSpacing: "0.05em"
           }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#F5C842", display: "inline-block", animation: "pulse 4s cubic-bezier(0.4,0,0.6,1) infinite" }} />
-            Desa Wisata Teluk Tomini
+            esa Tolai Barat — Mewujudkan Desa PADI(Produktif, Aman, Damai, Indah)
           </div>
 
           <h1 style={{
@@ -114,7 +114,7 @@ export default function HeroSection() {
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "16px" }}>
             <Link href="/profil" className="btn-primary" style={{ padding: "14px 32px", fontSize: "1.05rem", borderRadius: "14px", boxShadow: "0 8px 20px rgba(11,94,107,0.4)" }}>
               Jelajahi Desa
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M9 4L13 8L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M9 4L13 8L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </Link>
             <Link href="/wisata" style={{
               display: "inline-flex", alignItems: "center", gap: "8px", background: "rgba(255, 255, 255, 0.1)",
@@ -122,8 +122,8 @@ export default function HeroSection() {
               fontWeight: 500, fontSize: "1.05rem", padding: "14px 32px", borderRadius: "14px",
               transition: "all 0.2s", textDecoration: "none",
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)"; e.currentTarget.style.transform = "translateY(0)"; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)"; e.currentTarget.style.transform = "translateY(0)"; }}
             >
               Wisata Lokal
             </Link>
