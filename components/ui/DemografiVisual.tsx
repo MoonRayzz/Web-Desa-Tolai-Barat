@@ -1,171 +1,330 @@
 // components/ui/DemografiVisual.tsx
 "use client";
 
-import React, { useMemo, useState, useEffect } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { DusunData } from '@/types';
+import React, { useMemo, useState, useEffect, useRef } from "react";
+import type { DusunData } from "@/types";
 
 interface Props {
   totalJiwa: number;
-  totalKK?: string; 
   dusunList: DusunData[];
 }
 
-const DusunStatsList = ({ dusunList, totalJiwa }: { dusunList: DusunData[], totalJiwa: number }) => {
-  return (
-    <div className="space-y-6">
-      <h3 className="font-display font-bold text-xl text-ocean-900">Distribusi Per Dusun</h3>
-      <div className="space-y-5">
-        {dusunList.map((dusun) => {
-          const safeTotal = isNaN(Number(dusun.total)) ? 0 : Number(dusun.total);
-          const safeTotalJiwa = isNaN(Number(totalJiwa)) ? 0 : Number(totalJiwa);
-          const persentase = safeTotalJiwa > 0 ? (safeTotal / safeTotalJiwa) * 100 : 0;
-          
-          return (
-            <div key={dusun.id} className="space-y-2 group">
-              <div className="flex justify-between items-center text-sm">
-                <span className="font-bold text-ocean-800">{dusun.nama}</span>
-                <span className="font-bold text-ocean-900">{safeTotal.toLocaleString("id-ID")} Jiwa</span>
-              </div>
-              
-              <div className="w-full h-3 bg-ocean-50 rounded-full overflow-hidden border border-ocean-100/50">
-                <div 
-                  className="h-full bg-forest-500 rounded-full transition-all duration-1000 ease-out group-hover:bg-gold-500" 
-                  style={{ width: `${persentase}%` }}
-                />
-              </div>
+// ─── Palette per-dusun (cycling) ────────────────────────────────────────────
+const DUSUN_COLORS = [
+  { stroke: "#378ADD", bg: "#E6F1FB", text: "#185FA5", border: "#B5D4F4" },
+  { stroke: "#1D9E75", bg: "#E1F5EE", text: "#0F6E56", border: "#9FE1CB" },
+  { stroke: "#BA7517", bg: "#FAEEDA", text: "#854F0B", border: "#FAC775" },
+  { stroke: "#993556", bg: "#FBEAF0", text: "#72243E", border: "#F4C0D1" },
+  { stroke: "#534AB7", bg: "#EEEDFE", text: "#3C3489", border: "#CECBF6" },
+  { stroke: "#0F6E56", bg: "#E1F5EE", text: "#085041", border: "#5DCAA5" },
+];
 
-              <div className="flex gap-3 text-[10.5px] font-semibold uppercase tracking-wider text-ocean-500 pt-1">
-                <span className="bg-ocean-50 px-2 py-0.5 rounded-md border border-ocean-100/50">
-                  🏠 {dusun.kk} KK
-                </span>
-                <span className="bg-ocean-50 px-2 py-0.5 rounded-md border border-ocean-100/50">
-                  ♂️ L: {dusun.lakiLaki}
-                </span>
-                <span className="bg-ocean-50 px-2 py-0.5 rounded-md border border-ocean-100/50 text-pink-600">
-                  ♀️ P: {dusun.perempuan}
-                </span>
-              </div>
-            </div>
-          );
-        })}
+// ─── SVG Radial Ring ─────────────────────────────────────────────────────────
+const RADIUS = 22;
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+function RadialRing({
+  pct,
+  color,
+  animate,
+}: {
+  pct: number;
+  color: string;
+  animate: boolean;
+}) {
+  const offset = CIRCUMFERENCE - (pct / 100) * CIRCUMFERENCE;
+
+  return (
+    <div style={{ position: "relative", width: 60, height: 60, flexShrink: 0 }}>
+      <svg
+        width={60}
+        height={60}
+        viewBox="0 0 60 60"
+        style={{ transform: "rotate(-90deg)", display: "block" }}
+        role="img"
+        aria-label={`${Math.round(pct)}% dari total penduduk`}
+      >
+        {/* Track */}
+        <circle
+          cx={30} cy={30} r={RADIUS}
+          fill="none"
+          stroke="var(--color-background-secondary)"
+          strokeWidth={6}
+        />
+        {/* Fill */}
+        <circle
+          cx={30} cy={30} r={RADIUS}
+          fill="none"
+          stroke={color}
+          strokeWidth={6}
+          strokeLinecap="round"
+          strokeDasharray={CIRCUMFERENCE}
+          strokeDashoffset={animate ? offset : CIRCUMFERENCE}
+          style={{
+            transition: animate
+              ? "stroke-dashoffset 1.4s cubic-bezier(0.34, 1.56, 0.64, 1)"
+              : "none",
+          }}
+        />
+      </svg>
+      {/* Percentage label */}
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          fontSize: 11,
+          fontWeight: 500,
+          color: "var(--color-text-primary)",
+          lineHeight: 1,
+        }}
+      >
+        {Math.round(pct)}%
       </div>
     </div>
   );
-};
+}
 
+// ─── Dusun Card ───────────────────────────────────────────────────────────────
+function DusunCard({
+  dusun,
+  totalJiwa,
+  colorSet,
+  animate,
+}: {
+  dusun: DusunData;
+  totalJiwa: number;
+  colorSet: (typeof DUSUN_COLORS)[0];
+  animate: boolean;
+}) {
+  const jiwa = Number(dusun.total) || 0;
+  const kk = Number(dusun.kk) || 0;
+  const laki = Number(dusun.lakiLaki) || 0;
+  const perempuan = Number(dusun.perempuan) || 0;
+  const pct = totalJiwa > 0 ? (jiwa / totalJiwa) * 100 : 0;
+  const lPct = jiwa > 0 ? (laki / jiwa) * 100 : 50;
+
+  return (
+    <div
+      style={{
+        background: "var(--color-background-primary)",
+        border: "0.5px solid var(--color-border-tertiary)",
+        borderRadius: "var(--border-radius-lg)",
+        padding: "16px 16px 12px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
+      }}
+    >
+      {/* Top row: name + ring */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 500, color: "var(--color-text-primary)", lineHeight: 1.35 }}>
+            {dusun.nama}
+          </div>
+          <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 3 }}>
+            {jiwa.toLocaleString("id-ID")} jiwa
+          </div>
+        </div>
+        <RadialRing pct={pct} color={colorSet.stroke} animate={animate} />
+      </div>
+
+      {/* Mini gender split bar */}
+      <div
+        style={{
+          display: "flex",
+          height: 4,
+          borderRadius: 99,
+          overflow: "hidden",
+          background: "var(--color-background-secondary)",
+        }}
+        title={`Laki-laki ${Math.round(lPct)}% · Perempuan ${Math.round(100 - lPct)}%`}
+      >
+        <div
+          style={{
+            width: `${lPct}%`,
+            background: "#378ADD",
+            transition: animate ? "width 1.2s ease" : "none",
+          }}
+        />
+        <div style={{ flex: 1, background: "#D4537E" }} />
+      </div>
+
+      {/* Stats pills */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        <span style={{
+          fontSize: 10, fontWeight: 500, padding: "2px 7px", borderRadius: 4,
+          background: "var(--color-background-secondary)",
+          border: "0.5px solid var(--color-border-tertiary)",
+          color: "var(--color-text-secondary)",
+        }}>
+          🏠 {kk} KK
+        </span>
+        <span style={{
+          fontSize: 10, fontWeight: 500, padding: "2px 7px", borderRadius: 4,
+          background: "#E6F1FB", border: "0.5px solid #B5D4F4", color: "#185FA5",
+        }}>
+          ♂ {laki.toLocaleString("id-ID")}
+        </span>
+        <span style={{
+          fontSize: 10, fontWeight: 500, padding: "2px 7px", borderRadius: 4,
+          background: "#FBEAF0", border: "0.5px solid #F4C0D1", color: "#993556",
+        }}>
+          ♀ {perempuan.toLocaleString("id-ID")}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 export default function DemografiVisual({ totalJiwa, dusunList }: Props) {
-  const [isMounted, setIsMounted] = useState(false);
+  const [animate, setAnimate] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
+  // Trigger animation saat masuk viewport (IntersectionObserver)
   useEffect(() => {
-    setIsMounted(true);
+    if (!wrapRef.current) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setAnimate(true); obs.disconnect(); } },
+      { threshold: 0.2 }
+    );
+    obs.observe(wrapRef.current);
+    return () => obs.disconnect();
   }, []);
 
   const totals = useMemo(() => {
     let l = 0;
     let p = 0;
-    dusunList.forEach(d => {
-      l += isNaN(Number(d.lakiLaki)) ? 0 : Number(d.lakiLaki);
-      p += isNaN(Number(d.perempuan)) ? 0 : Number(d.perempuan);
+    dusunList.forEach((d) => {
+      l += Number(d.lakiLaki) || 0;
+      p += Number(d.perempuan) || 0;
     });
     return { l, p };
   }, [dusunList]);
 
-  const persentaseLaki = totalJiwa > 0 ? (totals.l / totalJiwa) * 100 : 0;
-  const persentasePerem = totalJiwa > 0 ? (totals.p / totalJiwa) * 100 : 0;
-
-  const genderData = [
-    { name: 'Laki-Laki', value: totals.l },
-    { name: 'Perempuan', value: totals.p },
-  ];
-
-  const COLORS = ['var(--color-ocean-600)', 'var(--color-pink-500)'];
-
-  if (!isMounted) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-12 bg-white rounded-3xl p-10 border border-ocean-100 shadow-card animate-pulse">
-        <div className="w-full h-[350px] bg-ocean-50 rounded-full flex items-center justify-center">
-           <span className="text-ocean-200">Memuat Grafik...</span>
-        </div>
-        <div className="space-y-6">
-          <div className="h-6 bg-ocean-50 rounded w-1/2"></div>
-          <div className="h-4 bg-ocean-50 rounded w-full"></div>
-          <div className="h-4 bg-ocean-50 rounded w-full"></div>
-          <div className="h-4 bg-ocean-50 rounded w-3/4"></div>
-        </div>
-      </div>
-    );
-  }
-
-  const renderCustomLegend = () => {
-    return (
-      <div className="flex justify-center gap-10 mt-8">
-        {genderData.map((entry, index) => {
-          const isLaki = entry.name === 'Laki-Laki';
-          const persentase = isLaki ? persentaseLaki : persentasePerem;
-          return (
-            <div key={entry.name} className="flex items-center gap-3">
-              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: COLORS[index] }} />
-              <div className="flex flex-col">
-                <span className="text-xs font-bold text-ocean-700 uppercase tracking-widest">{entry.name}</span>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-ocean-950">{entry.value.toLocaleString("id-ID")}</span>
-                  <span className="text-sm font-medium text-ocean-600">
-                    {entry.name === 'Laki-Laki' ? '♂' : '♀'} {persentase.toFixed(1)}%
-                  </span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
+  const safeTotalJiwa = totalJiwa || (totals.l + totals.p) || 1;
+  const lPct = (totals.l / safeTotalJiwa) * 100;
+  const pPct = (totals.p / safeTotalJiwa) * 100;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mt-12 bg-white rounded-3xl p-10 border border-ocean-100 shadow-card">
-      
-      <div className="space-y-6">
-        <h3 className="font-display font-bold text-xl text-ocean-900">Komposisi Gender</h3>
-        
-        {/* PERBAIKAN: Menghapus h-[350px] dari class dan memindahkannya ke style minHeight agar aman,
-            serta memberikan height={350} (angka pasti) pada ResponsiveContainer */}
-        <div className="w-full relative" style={{ minHeight: 350 }}>
-          <ResponsiveContainer width="100%" height={350}>
-            <PieChart>
-              <Pie
-                data={genderData}
-                cx="50%" 
-                cy="50%" 
-                labelLine={false} 
-                outerRadius={130} 
-                innerRadius={60} 
-                fill="#8884d8"
-                dataKey="value"
-                startAngle={90} 
-                endAngle={450} 
-                isAnimationActive={true}
-              >
-                {genderData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index]} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
+    <div ref={wrapRef} style={{ marginTop: 40 }}>
 
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-             <span className="text-4xl opacity-20">👥</span>
+      {/* ── Outer card wrapper ── */}
+      <div style={{
+        background: "white",
+        border: "1px solid var(--color-ocean-100, #E0F0FF)",
+        borderRadius: 24,
+        padding: "28px 28px 24px",
+        boxShadow: "var(--shadow-card, 0 2px 16px rgba(0,0,0,0.06))",
+      }}>
+
+        {/* ── Gender Split Bar ── */}
+        <div style={{ marginBottom: 24 }}>
+          {/* Label */}
+          <div style={{
+            fontSize: 11, fontWeight: 500, letterSpacing: "0.12em",
+            textTransform: "uppercase", color: "var(--color-ocean-500, #6B8FAB)",
+            marginBottom: 16,
+          }}>
+            Komposisi gender · total {safeTotalJiwa.toLocaleString("id-ID")} jiwa
+          </div>
+
+          {/* Two big numbers */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 12 }}>
+            <div>
+              <div style={{ fontSize: 36, fontWeight: 500, lineHeight: 1, color: "#378ADD" }}>
+                {totals.l.toLocaleString("id-ID")}
+              </div>
+              <div style={{ fontSize: 11, color: "var(--color-ocean-500, #6B8FAB)", marginTop: 4 }}>
+                laki-laki
+              </div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <div style={{ fontSize: 36, fontWeight: 500, lineHeight: 1, color: "#D4537E" }}>
+                {totals.p.toLocaleString("id-ID")}
+              </div>
+              <div style={{ fontSize: 11, color: "var(--color-ocean-500, #6B8FAB)", marginTop: 4 }}>
+                perempuan
+              </div>
+            </div>
+          </div>
+
+          {/* Animated split bar */}
+          <div style={{ display: "flex", height: 10, borderRadius: 99, overflow: "hidden", background: "#F0F6FF" }}>
+            <div
+              style={{
+                width: animate ? `${lPct}%` : "0%",
+                background: "#378ADD",
+                borderRadius: "99px 0 0 99px",
+                transition: animate ? "width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)" : "none",
+              }}
+            />
+            <div
+              style={{
+                width: animate ? `${pPct}%` : "0%",
+                background: "#D4537E",
+                borderRadius: "0 99px 99px 0",
+                transition: animate ? "width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s" : "none",
+              }}
+            />
+          </div>
+
+          {/* Pct labels */}
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+            <span style={{
+              fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 4,
+              background: "#E6F1FB", color: "#185FA5",
+            }}>
+              {lPct.toFixed(1)}% ♂
+            </span>
+            <span style={{
+              fontSize: 11, fontWeight: 500, padding: "2px 8px", borderRadius: 4,
+              background: "#FBEAF0", color: "#993556",
+            }}>
+              ♀ {pPct.toFixed(1)}%
+            </span>
           </div>
         </div>
-        
-        {renderCustomLegend()}
-        
-        <p className="text-xs text-ocean-400 text-center italic mt-4">
-          * Perbandingan populasi pria dan wanita dari total {totalJiwa.toLocaleString("id-ID")} jiwa.
-        </p>
-      </div>
 
-      <DusunStatsList dusunList={dusunList} totalJiwa={totalJiwa} />
+        {/* ── Divider ── */}
+        {dusunList.length > 0 && (
+          <div style={{
+            borderTop: "1px solid var(--color-ocean-100, #E0F0FF)",
+            marginBottom: 20,
+          }} />
+        )}
+
+        {/* ── Dusun Cards Grid ── */}
+        {dusunList.length > 0 && (
+          <div>
+            <div style={{
+              fontSize: 11, fontWeight: 500, letterSpacing: "0.12em",
+              textTransform: "uppercase", color: "var(--color-ocean-500, #6B8FAB)",
+              marginBottom: 14,
+            }}>
+              Distribusi per dusun
+            </div>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))",
+              gap: 12,
+            }}>
+              {dusunList.map((d, i) => (
+                <DusunCard
+                  key={d.id}
+                  dusun={d}
+                  totalJiwa={safeTotalJiwa}
+                  colorSet={DUSUN_COLORS[i % DUSUN_COLORS.length]}
+                  animate={animate}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
     </div>
   );
-} 
+}

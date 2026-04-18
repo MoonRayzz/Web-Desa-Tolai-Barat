@@ -8,6 +8,7 @@ import {
   incrementViews,
 } from "@/lib/firebase/berita";
 import { formatTanggal } from "@/lib/utils";
+import { sanitizeHtml } from "@/lib/sanitize";
 import type { Berita } from "@/types";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -122,10 +123,10 @@ export default async function BeritaDetailPage({ params }: Props) {
             )}
           </div>
 
-          {/* Konten */}
+          {/* Konten — disanitasi DOMPurify untuk cegah XSS */}
           <div
             className="prose-desa"
-            dangerouslySetInnerHTML={{ __html: berita.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(berita.content) }}
           />
 
           <div style={{

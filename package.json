@@ -12,8 +12,9 @@
     "clsx": "^2.1.1",
     "firebase": "^12.11.0",
     "framer-motion": "^12.38.0",
+    "isomorphic-dompurify": "^3.9.0",
     "js-cookie": "^3.0.5",
-    "next": "16.2.2",
+    "next": "^16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^3.8.1",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/dompurify": "^3.0.5",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^20.19.37",
     "@types/react": "^19",
